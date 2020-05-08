@@ -17,15 +17,26 @@ const menu = document.querySelector('.menu');
 const logo = document.querySelector('.logo');
 const cardsMenu = document.querySelector('.cards-menu');
 
-
 let login = localStorage.getItem('gloDelivery');
+
+function loginValidation(str) {
+  const nameReg = /^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/;
+  return nameReg.test(str);
+};
 
 function toggleModal() {
   modal.classList.toggle("is-open");
-}
+};
 
 function toggleModalAuth() {
   modalAuth.classList.toggle('is-open');
+  loginInput.style.borderColor = '';
+}
+
+function returnMain() {
+  containerPromo.classList.remove('hide');
+  restaurants.classList.remove('hide');
+  menu.classList.add('hide');
 }
 
 function authorized() {
@@ -38,6 +49,7 @@ function authorized() {
     buttonOut.style.display = '';
     buttonOut.removeEventListener('click', logOut);
     checkAuth();
+    returnMain();
   }
 
   console.log('Авторизован');
@@ -56,14 +68,19 @@ function notAuthorized() {
 
   function logIn(event) {
     event.preventDefault();
-    login = loginInput.value;
-    localStorage.setItem('gloDelivery', login);
-    toggleModalAuth();
-    buttonAuth.removeEventListener('click', toggleModalAuth);
-    closeAuth.removeEventListener('click', toggleModalAuth);
-    logInForm.removeEventListener('submit', logIn);
-    logInForm.reset();
-    checkAuth();
+    if (loginValidation(loginInput.value)){
+      login = loginInput.value;
+      localStorage.setItem('gloDelivery', login);
+      toggleModalAuth();
+      buttonAuth.removeEventListener('click', toggleModalAuth);
+      closeAuth.removeEventListener('click', toggleModalAuth);
+      logInForm.removeEventListener('submit', logIn);
+      logInForm.reset();
+      checkAuth();
+    } else {
+      loginInput.style.borderColor = 'tomato';
+      loginInput.style.outline = 'transparent';
+    }
   }
 
   buttonAuth.addEventListener('click', toggleModalAuth);
@@ -134,15 +151,17 @@ function openGoods(event) {
   const restaurant = target.closest('.card-restaurant');
 
   if (restaurant) {
-    cardsMenu.textContent = '';
-
-    containerPromo.classList.add('hide');
-    restaurants.classList.add('hide');
-    menu.classList.remove('hide');
-
-    createCardGood();
-    createCardGood();
-    createCardGood();
+    if (login) {
+      cardsMenu.textContent = '';
+      containerPromo.classList.add('hide');
+      restaurants.classList.add('hide');
+      menu.classList.remove('hide');
+      createCardGood();
+      createCardGood();
+      createCardGood();
+    } else {
+      toggleModalAuth();
+    }
   }
 
 }
@@ -164,3 +183,10 @@ checkAuth();
 createCardRestaurant();
 createCardRestaurant();
 createCardRestaurant();
+
+new Swiper('.swiper-container', {
+  loop: true,
+  autoplay: {
+    delay: 3000
+  }
+});
